@@ -1,6 +1,5 @@
-package com.sugarmanz.auto.gradle.plugins
+package com.sugarmanz.auto.gradle.dsl
 
-import com.sugarmanz.auto.gradle.PluginDeclaration
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
@@ -10,6 +9,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 
+@AutoDslMarker
 @Serializable(Plugins.Serializer::class)
 // TODO: Configure gradle plugin by default
 class Plugins(private val plugins: MutableList<PluginDeclaration> = mutableListOf()) : MutableList<PluginDeclaration> by plugins {

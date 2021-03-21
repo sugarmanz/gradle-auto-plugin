@@ -1,13 +1,15 @@
 package com.sugarmanz.auto.gradle
 
+import com.sugarmanz.auto.gradle.dsl.AutoExtension
+import com.sugarmanz.auto.gradle.extensions.exec
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import net.researchgate.release.ReleaseExtension
-import net.researchgate.release.ReleasePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.Convention
-import kotlin.reflect.typeOf
-
-//import org.gradle.kotlin.dsl.Projec
+import org.gradle.api.Task
+import org.gradle.kotlin.dsl.*
+import java.io.IOException
 
 class GradleAutoPlugin : Plugin<Project> {
 
@@ -19,32 +21,80 @@ class GradleAutoPlugin : Plugin<Project> {
 
         if (!target.plugins.hasPlugin("net.researchgate.release")) {
             target.plugins.apply("net.researchgate.release")
-//            target.plugins.withType(ReleasePlugin::class.java) {
-//                it.
-//            }
+
+            target.configure<ReleaseExtension> {
+                failOnPublishNeeded = false
+            }
         }
 
-        val process = Runtime.getRuntime().exec("auto")
-        if (process.exitValue() != 1) {
-            Runtime.getRuntime().exec("cu")
+        val auto = target.getAuto().apply {
+            exec()
         }
-        if (ex)
 
-//        target.configure()<ReleaseExtension>(ReleaseExtension::class.java) {
-//            failOnPublishNeeded = false
-//        }
+        target.tasks {
 
-//        target.gradle.addListener(
-//            object : DependencyResolutionListener {
-//                override fun beforeResolve(dependencies: ResolvableDependencies) {
-//                    target.addDependency("api", "com.intuit.hooks:hooks:$version")
-//                    target.addDependency("compileOnly", "io.arrow-kt:arrow-annotations:$arrowVersion")
-//                    target.gradle.removeListener(this)
-//                }
-//
-//                override fun afterResolve(dependencies: ResolvableDependencies) = Unit
-//            }
-//        )
+            // TODO: Create task types
+            val autorc by registering {
+                group = "auto"
+                doLast {
+                    val extension = target.extensions.findByType(AutoExtension::class.java)
+                        ?: AutoExtension()
+
+                    target.projectDir.resolve(".autorc").writeText(Json {
+                        prettyPrint = true
+                    }.encodeToString(extension))
+                }
+            }
+
+            val shipit by registering {
+                group = "auto"
+                dependsOn(autorc)
+                doLast {
+                    require(listOfNotNull(
+                        auto,
+                        "shipit",
+                        if (target.properties["auto.dryRun"] == "true") "--dry-run" else null,
+                        *((target.properties["auto.freeArgs"] as? String)?.split(",".toRegex())?.toTypedArray()
+                            ?: emptyArray())
+                    ).exec { println(it) } == 0) { "shipit did not succeed" }
+                }
+            }
+
+            val createReleaseTag: Task by getting {
+                enabled = false
+            }
+
+            val preTagCommit: Task by getting {
+                enabled = false
+            }
+
+            val commitNewVersion: Task by getting {
+                enabled = false
+            }
+        }
+    }
+
+    /** Extension to determine what auto to use */
+    // TODO: Incorporate versioning
+    private fun Project.getAuto(): String {
+        // is auto on path
+        try {
+            "auto".exec()
+            return "auto"
+        } catch (exception: IOException) {}
+
+        // is auto in build
+        try {
+            "${buildDir}/auto".exec()
+        } catch (exception: IOException) {
+            // okay, let's get it
+            "mkdir $buildDir".exec()
+            // TODO: need to configure multiplatform support
+            "curl -kL -o ${buildDir.resolve("auto.gz")} https://github.com/intuit/auto/releases/download/v10.16.8/auto-macos.gz".exec()
+            "gunzip ${buildDir.resolve("auto.gz")}".exec()
+            "chmod a+x ${buildDir.resolve("auto")}".exec()
+        }
+
+        return "${buildDir}/auto"
     }
 }
-

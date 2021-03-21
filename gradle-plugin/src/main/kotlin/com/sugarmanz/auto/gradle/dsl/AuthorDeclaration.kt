@@ -1,4 +1,4 @@
-package com.sugarmanz.auto.gradle
+package com.sugarmanz.auto.gradle.dsl
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -41,6 +41,7 @@ sealed class AuthorDeclaration {
 
     }
 
+    @AutoDslMarker
     @Serializable
     class Explicit : AuthorDeclaration() {
 

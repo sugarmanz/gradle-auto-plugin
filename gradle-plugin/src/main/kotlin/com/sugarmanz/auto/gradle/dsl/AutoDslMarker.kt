@@ -1,2 +1,4 @@
-package com.sugarmanz.auto.gradle.dsl 
+package com.sugarmanz.auto.gradle.dsl
 
+@DslMarker
+internal annotation class AutoDslMarker
