@@ -1,7 +1,6 @@
-package com.sugarmanz.auto.gradle.dsl
+package com.sugarmanz.auto.config
 
 import kotlinx.serialization.Serializable
-import org.gradle.api.Action
 
 @AutoDslMarker
 @Serializable
@@ -14,9 +13,6 @@ open class AutoExtension {
 
     val plugins = Plugins()
 
-    // TODO: Consider if we need to re-init plugins here
-    fun plugins(configure: Action<Plugins>) = configure.execute(plugins)
-
     // TODO: Maybe just always translate to string
     lateinit var author: AuthorDeclaration
 
@@ -26,10 +22,6 @@ open class AutoExtension {
         is AuthorDeclaration.Explicit -> author.toString()
     }; set(value) {
         author = AuthorDeclaration.FormattedString(value)
-    }
-
-    fun author(configure: Action<AuthorDeclaration.Explicit>) {
-        author = AuthorDeclaration.Explicit().apply(configure::execute)
     }
 
     fun author(formatted: AuthorDeclaration.FormattedString) {

@@ -1,6 +1,6 @@
 package com.sugarmanz.auto.gradle
 
-import com.sugarmanz.auto.gradle.dsl.AutoExtension
+import com.sugarmanz.auto.config.AutoExtension
 import com.sugarmanz.auto.gradle.extensions.exec
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -18,6 +18,12 @@ class GradleAutoPlugin : Plugin<Project> {
             "auto",
             AutoExtension::class.java
         )
+
+        if (!target.tasks.any { it.name == "build" }) {
+            val build by target.tasks.registering {
+                group = "build"
+            }
+        }
 
         if (!target.plugins.hasPlugin("net.researchgate.release")) {
             target.plugins.apply("net.researchgate.release")

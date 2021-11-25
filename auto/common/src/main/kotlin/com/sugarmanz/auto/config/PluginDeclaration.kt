@@ -1,4 +1,4 @@
-package com.sugarmanz.auto.gradle.dsl
+package com.sugarmanz.auto.config
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer

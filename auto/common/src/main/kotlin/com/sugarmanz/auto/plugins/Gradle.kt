@@ -1,7 +1,7 @@
-package com.sugarmanz.auto.gradle.plugins
+package com.sugarmanz.auto.plugins
 
-import com.sugarmanz.auto.gradle.dsl.PluginDeclaration
-import com.sugarmanz.auto.gradle.dsl.Plugins
+import com.sugarmanz.auto.config.PluginDeclaration
+import com.sugarmanz.auto.config.Plugins
 import kotlinx.serialization.Serializable
 
 // TODO: Can we generate these from TS types?

@@ -1,9 +1,5 @@
-allprojects {
-    repositories {
-        jcenter()
-        mavenLocal()
-        mavenCentral()
-        maven("https://plugins.gradle.org/m2/")
-        maven("https://oss.jfrog.org/artifactory/oss-snapshot-local/")
+tasks {
+    val publish by creating {
+        dependsOn(gradle.includedBuild("auto").task(":publish"))
     }
 }

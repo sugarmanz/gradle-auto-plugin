@@ -1,3 +1,10 @@
 rootProject.name = "gradle-auto-plugin"
-// TODO: Maybe make auto JAR solely responsible for wrapping binary
-include("auto", "gradle-plugin")
+
+include(
+    ":examples:simple-gradle-example",
+    ":examples:simple-gradle-kts-example",
+)
+
+pluginManagement {
+    includeBuild("auto")
+}
