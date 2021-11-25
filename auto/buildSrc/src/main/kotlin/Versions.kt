@@ -1,22 +1,33 @@
-import kotlin.reflect.KClass
+import org.gradle.api.Project
+import org.gradle.api.initialization.Settings
+import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.support.delegates.SettingsDelegate
 import kotlin.reflect.KProperty
 
-object Versions : GettingDelegate() {
 
-    val kotlin by Versions
+typealias Properties = Map<String, *>
 
+fun Properties.version(name: String) = get("versions.$name") as String
+
+class PropertiesDelegate(val properties: Map<String, *>, val name: String? = null) {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>) = properties.version(name ?: property.name)
 }
 
-abstract class GettingDelegate {
-    operator fun getValue(thisRef: Any?, property: KProperty<*>) = NamedDelegate(this::class, property.name)
-        .getValue(thisRef, property)
+fun Project.versions(name: String? = null) = PropertiesDelegate(properties, name)
 
-    operator fun invoke(name: String) = NamedDelegate(this::class, name)
+val Project.versions get() = versions()
 
-    class NamedDelegate(private val `class`: KClass<*>, private val name: String) {
-        operator fun getValue(thisRef: Any?, property: KProperty<*>) = `class`.members
-            .filterIsInstance<KProperty<String>>()
-            .first { it.name == name }
-            .call()
-    }
-}
+fun Project.version(name: String) = properties.version(name)
+
+fun Settings.versions(name: String? = null) = PropertiesDelegate(extra.properties, name)
+
+val Settings.versions get() = versions()
+
+fun Settings.version(name: String) = extra.properties.version(name)
+
+fun SettingsDelegate.versions(name: String? = null) = settings.versions(name)
+
+val SettingsDelegate.versions get() = versions()
+
+fun SettingsDelegate.version(name: String) = settings.version(name)
+

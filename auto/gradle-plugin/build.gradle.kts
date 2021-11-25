@@ -20,5 +20,5 @@ dependencies {
 
     implementation(kotlin("gradle-plugin-api"))
     implementation("net.researchgate", "gradle-release", "2.8.1")
-    implementation("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.0.1")
+    implementation("org.jetbrains.kotlinx", "kotlinx-serialization-json", version("kotlinx.serialization"))
 }
